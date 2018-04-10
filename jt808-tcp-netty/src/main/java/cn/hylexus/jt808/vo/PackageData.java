@@ -2,6 +2,8 @@ package cn.hylexus.jt808.vo;
 
 import java.util.Arrays;
 
+import cn.hylexus.jt808.util.BitOperator;
+import cn.hylexus.jt808.util.HexStringUtils;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import io.netty.channel.Channel;
@@ -60,7 +62,7 @@ public class PackageData {
 	@Override
 	public String toString() {
 		return "PackageData [msgHeader=" + msgHeader + ", msgBodyBytes=" + Arrays.toString(msgBodyBytes) + ", checkSum="
-				+ checkSum + ", address=" + channel + "]";
+				+ checkSum + /*", address=" + channel +*/ "]";
 	}
 
 	public static class MsgHeader {
@@ -184,11 +186,15 @@ public class PackageData {
 
 		@Override
 		public String toString() {
-			return "MsgHeader [msgId=" + msgId + ", msgBodyPropsField=" + msgBodyPropsField + ", msgBodyLength="
+			return "MsgHeader [msgId=0x" + msgIdToHexString() + ", msgBodyPropsField=" + msgBodyPropsField + ", msgBodyLength="
 					+ msgBodyLength + ", encryptionType=" + encryptionType + ", hasSubPackage=" + hasSubPackage
 					+ ", reservedBit=" + reservedBit + ", terminalPhone=" + terminalPhone + ", flowId=" + flowId
 					+ ", packageInfoField=" + packageInfoField + ", totalSubPackage=" + totalSubPackage
 					+ ", subPackageSeq=" + subPackageSeq + "]";
+		}
+
+		public String msgIdToHexString() {
+			return HexStringUtils.toHexString(new BitOperator().integerTo2Bytes(msgId));
 		}
 
 	}

@@ -52,7 +52,7 @@ public class MsgDecoder {
 		int calculatedCheckSum = this.bitOperator.getCheckSum4JT808(data, 0, data.length - 1);
 		ret.setCheckSum(checkSumInPkg);
 		if (checkSumInPkg != calculatedCheckSum) {
-			log.warn("检验码不一致,msgid:{},pkg:{},calculated:{}", msgHeader.getMsgId(), checkSumInPkg, calculatedCheckSum);
+			log.warn("检验码不一致,msgid:0x{},pkg:{},calculated:{}", msgHeader.msgIdToHexString(), checkSumInPkg, calculatedCheckSum);
 		}
 		return ret;
 	}

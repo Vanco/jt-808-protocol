@@ -11,7 +11,7 @@
 
 	<appender name="errorAppender"
 		class="cn.hylexus.jt808.common.MyClassificationLogAppender">
-		<param name="File" value="${catalina.home}/logs/tpms-udp/error.log" />
+		<param name="File" value="/tmp/logs/error.log" />
 		<param name="append" value="true" />
 		<param name="DatePattern" value="'-'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="error" />
@@ -26,7 +26,7 @@
 	</appender>
 	<appender name="infoAppender"
 		class="cn.hylexus.jt808.common.MyClassificationLogAppender">
-		<param name="File" value="${catalina.home}/logs/tpms-udp/info.log" />
+		<param name="File" value="/tmp/logs/info.log" />
 		<param name="Append" value="true" />
 		<param name="DatePattern" value="'-'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="info" />
@@ -41,7 +41,7 @@
 	</appender>
 	<appender name="warnAppender"
 		class="cn.hylexus.jt808.common.MyClassificationLogAppender">
-		<param name="File" value="${catalina.home}/logs/tpms-udp/warn.log" />
+		<param name="File" value="/tmp/logs/warn.log" />
 		<param name="Append" value="true" />
 		<param name="DatePattern" value="'-'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="warn" />
@@ -56,7 +56,7 @@
 	</appender>
 	<appender name="debugAppender"
 		class="cn.hylexus.jt808.common.MyClassificationLogAppender">
-		<param name="File" value="${catalina.home}/logs/tpms-udp/debug.log" />
+		<param name="File" value="/tmp/logs/debug.log" />
 		<param name="Append" value="true" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="debug" />
@@ -71,7 +71,7 @@
 	</appender>
 
 	<appender name="sqlAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${catalina.home}/logs/tpms-udp/sql.log" />
+		<param name="File" value="/tmp/logs/sql.log" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="info" />
 		<param name="Append" value="true" />
@@ -84,11 +84,18 @@
 
 	<appender name="webLogAppender"
 		class="cn.hylexus.jt808.common.MyClassificationLogAppender">
-		<param name="File" value="D:/tomcat/logs/tpms-udp/info.log" />
+		<param name="File" value="/tmp/logs/info.log" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<param name="Threshold" value="info" />
 		<param name="Append" value="true" />
 		<param name="Encoding" value="utf-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="guiAppender"
+			  class="van.demo.TextAreaAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %m%n" />
 		</layout>
@@ -126,6 +133,9 @@
 		<appender-ref ref="webLogAppender" />
 		<!-- <appender-ref ref="consoleAppender" /> -->
 	</logger>
+	<logger name="gui">
+		<appender-ref ref="guiAppender"/>
+	</logger>
 	<logger name="cn.kkbc.tpms">
 		<level value="debug"></level>
 	</logger>
@@ -148,6 +158,7 @@
 		<appender-ref ref="warnAppender" />
 		<appender-ref ref="infoAppender" />
 		<appender-ref ref="debugAppender" />
+		<appender-ref ref="guiAppender"/>
 	</root>
 
 </log4j:configuration>

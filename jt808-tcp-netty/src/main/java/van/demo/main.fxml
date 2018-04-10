@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="van.demo.MainController"
+            prefHeight="400.0" prefWidth="600.0">
+
+<VBox spacing="8" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <padding>
+        <Insets topRightBottomLeft="10"/>
+    </padding>
+    <Text text="JT/808 Decoder" style="-fx-font-size: 24" textAlignment="CENTER"/>
+
+    <Label text="Hex/Base64" maxWidth="Infinity"/>
+    <TextArea fx:id="input" wrapText="true" maxWidth="Infinity"/>
+
+    <HBox alignment="BOTTOM_RIGHT" spacing="5">
+        <Button text="Clear Log" onAction="#clearLog"/>
+        <Button text="Reset" onAction="#reset" />
+        <Button text="Decode" onAction="#decode"/>
+    </HBox>
+
+
+    <TextArea fx:id="target" wrapText="true" editable="false" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"/>
+
+    <TextArea fx:id="logger" wrapText="true" editable="false" maxWidth="Infinity"/>
+</VBox>
+
+
+</AnchorPane>
