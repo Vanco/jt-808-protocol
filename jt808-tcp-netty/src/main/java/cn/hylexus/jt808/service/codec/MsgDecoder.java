@@ -242,10 +242,11 @@ public class MsgDecoder {
 				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
 				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
 				int cmdLen = this.parseIntFromBytes(data, 7, 1);
+				sb.append("Commands:").append(cmdLen).append("\n");
 				for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
-					sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 9 + i, 1)).append("\n");
-					sb.append("\tCmdParam:").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
+					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 9 + i, 1)).append("\n");
+					sb.append("\tCmdParam").append(i).append(":").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
 				}
 				break;
 			case 0x0f41:
@@ -253,10 +254,11 @@ public class MsgDecoder {
 				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
 				sb.append("FlowId:").append(this.parseIntFromBytes(data, 7, 2)).append("\n");
 				cmdLen = this.parseIntFromBytes(data, 9, 1);
-				for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
-					sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 11 + i, 1)).append("\n");
-					sb.append("\tCmdStatus:").append(this.parseIntFromBytes(data, 12 + i, 1)).append("\n");
+                sb.append("Commands:").append(cmdLen).append("\n");
+                for (int i = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
+					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 11 + i, 1)).append("\n");
+					sb.append("\tCmdStatus").append(i).append(":").append(this.parseIntFromBytes(data, 12 + i, 1)).append("\n");
 				}
 				break;
 			case 0x8f51:
@@ -264,7 +266,7 @@ public class MsgDecoder {
 				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
 				cmdLen = this.parseIntFromBytes(data, 7, 1);
 				for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
 				}
 				break;
 			case 0x0f51:
@@ -275,15 +277,48 @@ public class MsgDecoder {
 				cmdLen = this.parseIntFromBytes(data, 10, 1);
 				for (int i = 0, offset = 0; i < cmdLen; i++) {
 					int cmdNo = this.parseIntFromBytes(data, 11 + i + offset, 1);
-					sb.append("\tCmdNo:").append(cmdNo).append("\n");
+					sb.append("\tCmdNo").append(i).append(":").append(cmdNo).append("\n");
 					int resultLen = this.parseIntFromBytes(data, 12 + i + offset, 1);
-					sb.append("\tCmdResult:");
+					sb.append("\tCmdResult").append(i).append(":").append("\n");
 					byte[] resultBytes = Arrays.copyOfRange(data, 13 + i + offset, resultLen);
 					sb.append(expend0f51Result(cmdNo, resultLen, resultBytes));
-					sb.append("\n");
 					offset = offset + resultLen;
 				}
 				break;
+            case 0x9102:
+                sb.append("Time:").append(this.parseBcdStringFromBytes(data, 0, 6)).append("\n");
+                sb.append("Mileage:").append(this.parseIntFromBytes(data, 6, 4)).append("\n");
+                sb.append("AccumulateMileage:").append(this.parseIntFromBytes(data, 10, 4)).append("\n");
+                sb.append("AccumulateFuel:").append(this.parseIntFromBytes(data, 14, 4));
+                break;
+            case 0x0f3a:
+                sb.append("Version:").append("\n");
+                int v = this.parseIntFromBytes(data, 0, 1);
+                sb.append("\tF3A Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
+                sb.append("\tRetransmission?:").append(bitOperator.getBitAtS(v, 7));
+
+                sb.append("Latitude:").append(this.parseIntFromBytes(data, 1, 4)).append("\n");
+                sb.append("Longitude:").append(this.parseIntFromBytes(data, 5, 4)).append("\n");
+                sb.append("Attitude:").append(this.parseIntFromBytes(data, 9, 2)).append("\n");
+                sb.append("Direction:").append(this.parseIntFromBytes(data, 11, 2)).append("\n");
+                sb.append("GpsTime:").append(this.parseBcdStringFromBytes(data, 13, 6)).append("\n");
+
+                int secondPkgNum = this.parseIntFromBytes(data, 19, 1);
+                if (secondPkgNum > 10) {
+                    log.warn("二级包个数超过（10）：{}", secondPkgNum);
+                }
+
+                sb.append("Level 2 package number:").append(secondPkgNum).append("\n");
+                for (int i = 0; i < secondPkgNum; i ++) {
+                    sb.append("\tFaultInfoType").append(i).append(":").append(this.parseIntFromBytes(data, 20 + i, 1)).append("\n");
+                    sb.append("\tFaultInfoLength").append(i).append(":").append(this.parseIntFromBytes(data, 21 + i, 1)).append("\n");
+                    sb.append("\tSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 22 + i, 2)).append("\n");
+                    sb.append("\tGasolineThrottle").append(i).append(":").append(this.parseIntFromBytes(data, 24 + i, 1)).append("\n");
+                    sb.append("\tBrakeSignal").append(i).append(":").append(this.parseIntFromBytes(data, 24 + i, 1)).append("\n");
+                }
+                break;
+
+				default: sb.append(Arrays.toString(data)).append("\n");
 		}
 
 		return sb.toString();
@@ -323,30 +358,72 @@ public class MsgDecoder {
 				break;
 
 			case 0x09: // Light
-
+				int lightNum = resultBytes[0];
+				for (int i = 0, p = 1; i < lightNum; i ++) {
+				    sb.append("\t\t").append(lightIdToName(resultBytes[p++])).append(resultBytes[p++]).append("\n");
+                }
 				break;
 			case 0x0b: //Financial Lock
+                assert resultLen == 1;
+                sb.append("\t\tFinancialLock:").append(resultBytes[0]).append("\n");
 				break;
 			case 0x0d: //Financial lock active
+                assert resultLen == 1;
+                sb.append("\t\tFinancialLockActive:").append(resultBytes[0]).append("\n");
 				break;
 			case 0x0f: //Engine
+                assert resultLen == 1;
+                sb.append("\t\tEngine:").append(resultBytes[0]).append("\n");
 				break;
 			case 0x11: //Acc
+                assert resultLen == 1;
+                sb.append("\t\tACC:").append(resultBytes[0]).append("\n");
 				break;
 			case 0x13: // Wifi
+                assert resultLen == 1;
+                sb.append("\t\tWIFI:").append(resultBytes[0]).append("\n");
 				break;
 			case 0x14: // A/C
+                assert resultLen == 5;
+                sb.append("\t\tA/C ON/OFF Status:").append(resultBytes[0]).append("\n");
+                sb.append("\t\tTemperature:").append(resultBytes[1]).append("\n");
+                sb.append("\t\tFrontDefrost:").append(resultBytes[2]).append("\n");
+                sb.append("\t\tRearDefrost:").append(resultBytes[3]).append("\n");
+                sb.append("\t\tRearViewMirror:").append(resultBytes[4]).append("\n");
 				break;
 			case 0x15: // Windscreen wiper
+                assert resultLen == 2;
+                sb.append("\t\tFrontWindScreenWiper:").append(resultBytes[0]).append("\n");
+                sb.append("\t\tRearWindScreenWiper:").append(resultBytes[1]).append("\n");
 				break;
-			case 0x16: // Rear Mirror view
+			case 0x16: // Rear view mirror
+                assert resultLen == 2;
+                sb.append("\t\tDriveSideWingMirror:").append(resultBytes[0]).append("\n");
+                sb.append("\t\tPassengerSideWingMirror:").append(resultBytes[1]).append("\n");
 				break;
 		}
 
 		return sb.toString();
 	}
 
-	private float parseFloatFromBytes(byte[] data, int startIndex, int length) {
+    private String lightIdToName(byte lid) {
+	    switch (lid) {
+            case 1: return "DippedBeam:";
+            case 2: return "MainBeam:";
+            case 3: return "TurnLeft:";
+            case 4: return "TurnRight:";
+            case 5: return "HazardFlasher:";
+            case 6: return "IdentificationLamp:";
+            case 7: return "BrakeLamp:";
+            case 8: return "FrontFogLamp:";
+            case 9: return "RearFogLamp:";
+            case 10: return "VariousSmallLamp:";
+            case 11: return "DaytimeRunningLamp:";
+            default: return "";
+        }
+    }
+
+    private float parseFloatFromBytes(byte[] data, int startIndex, int length) {
 		return this.parseFloatFromBytes(data, startIndex, length, 0f);
 	}
 
