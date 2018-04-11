@@ -5,9 +5,12 @@ import cn.hylexus.jt808.util.HexStringUtils;
 import cn.hylexus.jt808.vo.PackageData;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleGroup;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
@@ -18,6 +21,8 @@ import java.util.regex.Pattern;
  */
 public class MainController implements Initializable {
     public TextArea logger;
+    public RadioButton rbHex;
+    public RadioButton rbBase64;
     private MsgDecoder decoder = new MsgDecoder();
 
     public TextArea target;
@@ -25,23 +30,34 @@ public class MainController implements Initializable {
 
     public void decode(ActionEvent actionEvent) {
 
-        String text = input.getText();
+        String text = input.getText().trim();
 
         if (text.trim().length() == 0) {
             logger.appendText("Please Input...\n");
             return;
         }
 
-        String base64Patten = "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$";
-        if (Pattern.compile(base64Patten).matcher(text).matches()) {
-            text = new String(Base64.getDecoder().decode(text.getBytes()));
+        if (rbBase64.isSelected()) {
+            byte[] bs = Base64.getDecoder().decode(text.getBytes());
+            byte[] bytes = Arrays.copyOfRange(bs, 1, bs.length - 1);
+            text = HexStringUtils.toHexString(bytes);
             logger.appendText("Decoded Base64:");
             logger.appendText(text);
             logger.appendText("\n");
+
+            PackageData packageData = decoder.bytes2PackageData(bytes);
+            target.appendText(packageData.getMsgHeader().toString());
+            target.appendText("\n");
+            target.appendText(decoder.toBodyString(packageData));
+        } else {
+            String hex = text.replaceFirst("^7[e|E]", "").replaceFirst("7[e|E]$", "");
+
+            PackageData packageData = decoder.bytes2PackageData(HexStringUtils.hexString2Bytes(hex).getBytes());
+            target.appendText(packageData.getMsgHeader().toString());
+            target.appendText("\n");
+            target.appendText(decoder.toBodyString(packageData));
         }
 
-        PackageData packageData = decoder.bytes2PackageData(HexStringUtils.hexString2Bytes(text.replaceFirst("^7e", "").replaceFirst("7e$", "")).getBytes());
-        target.setText(packageData.toString());
         input.requestFocus();
     }
 

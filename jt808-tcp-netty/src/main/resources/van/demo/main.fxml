@@ -19,7 +19,14 @@
     </padding>
     <Text text="JT/808 Decoder" style="-fx-font-size: 24" textAlignment="CENTER"/>
 
-    <Label text="Hex/Base64" maxWidth="Infinity"/>
+    <HBox>
+        <fx:define>
+            <ToggleGroup fx:id="tgFormat"/>
+        </fx:define>
+        <Label text="Choose format Hex/Base64" maxWidth="Infinity"/>
+        <RadioButton fx:id="rbHex" text="Hex" toggleGroup="$tgFormat" selected="true"/>
+        <RadioButton fx:id="rbBase64" text="Base64" toggleGroup="$tgFormat"/>
+    </HBox>
     <TextArea fx:id="input" wrapText="true" maxWidth="Infinity"/>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="5">

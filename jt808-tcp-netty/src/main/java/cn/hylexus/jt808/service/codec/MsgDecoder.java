@@ -12,6 +12,8 @@ import cn.hylexus.jt808.vo.PackageData.MsgHeader;
 import cn.hylexus.jt808.vo.req.TerminalRegisterMsg;
 import cn.hylexus.jt808.vo.req.TerminalRegisterMsg.TerminalRegInfo;
 
+import java.util.Arrays;
+
 public class MsgDecoder {
 
 	private static final Logger log = LoggerFactory.getLogger(MsgDecoder.class);
@@ -225,6 +227,123 @@ public class MsgDecoder {
 		System.arraycopy(data, 22, tmp, 0, 6);
 		String time = this.parseBcdStringFromBytes(data, 22, 6);
 		return ret;
+	}
+
+	public String toBodyString(PackageData packageData) {
+		StringBuilder sb = new StringBuilder();
+
+		MsgHeader msgHeader = packageData.getMsgHeader();
+		int msgId = msgHeader.getMsgId();
+
+		byte[] data = packageData.getMsgBodyBytes();
+
+		switch (msgId) {
+			case 0x8f41:
+				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
+				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
+				int cmdLen = this.parseIntFromBytes(data, 7, 1);
+				for (int i = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
+					sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 9 + i, 1)).append("\n");
+					sb.append("\tCmdParam:").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
+				}
+				break;
+			case 0x0f41:
+				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
+				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
+				sb.append("FlowId:").append(this.parseIntFromBytes(data, 7, 2)).append("\n");
+				cmdLen = this.parseIntFromBytes(data, 9, 1);
+				for (int i = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
+					sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 11 + i, 1)).append("\n");
+					sb.append("\tCmdStatus:").append(this.parseIntFromBytes(data, 12 + i, 1)).append("\n");
+				}
+				break;
+			case 0x8f51:
+				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
+				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
+				cmdLen = this.parseIntFromBytes(data, 7, 1);
+				for (int i = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
+				}
+				break;
+			case 0x0f51:
+				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
+				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
+				sb.append("PackageFlag:").append(this.parseIntFromBytes(data, 7, 1)).append("\n");
+				sb.append("FlowId:").append(this.parseIntFromBytes(data, 8, 2)).append("\n");
+				cmdLen = this.parseIntFromBytes(data, 10, 1);
+				for (int i = 0, offset = 0; i < cmdLen; i++) {
+					int cmdNo = this.parseIntFromBytes(data, 11 + i + offset, 1);
+					sb.append("\tCmdNo:").append(cmdNo).append("\n");
+					int resultLen = this.parseIntFromBytes(data, 12 + i + offset, 1);
+					sb.append("\tCmdResult:");
+					byte[] resultBytes = Arrays.copyOfRange(data, 13 + i + offset, resultLen);
+					sb.append(expend0f51Result(cmdNo, resultLen, resultBytes));
+					sb.append("\n");
+					offset = offset + resultLen;
+				}
+				break;
+		}
+
+		return sb.toString();
+	}
+
+	private String expend0f51Result(int cmdNo, int resultLen, byte[] resultBytes) {
+		StringBuilder sb = new StringBuilder();
+		switch (cmdNo) {
+			case 0x02: //Door
+				assert resultLen == 2;
+				int result = bitOperator.twoBytesToInteger(resultBytes);
+				sb.append("\t\tMainDriveDoor:").append(bitOperator.getBitAtS(result, 0)).append("\n");
+				sb.append("\t\tMainDriveDoorValid:").append(bitOperator.getBitAtS(result, 1)).append("\n");
+				sb.append("\t\tDeputyDriveDoor:").append(bitOperator.getBitAtS(result, 2)).append("\n");
+				sb.append("\t\tDeputyDriveDoorValid:").append(bitOperator.getBitAtS(result, 3)).append("\n");
+				sb.append("\t\tMainRearDoor:").append(bitOperator.getBitAtS(result, 4)).append("\n");
+				sb.append("\t\tMainRearDoorValid:").append(bitOperator.getBitAtS(result, 5)).append("\n");
+				sb.append("\t\tDeputyRearDoor:").append(bitOperator.getBitAtS(result, 6)).append("\n");
+				sb.append("\t\tDeputyRearDoorValid:").append(bitOperator.getBitAtS(result, 7)).append("\n");
+				sb.append("\t\tTailGate:").append(bitOperator.getBitAtS(result, 8)).append("\n");
+				sb.append("\t\tTailGateValid:").append(bitOperator.getBitAtS(result, 9)).append("\n");
+				sb.append("\t\tPowerDoorLocks:").append(bitOperator.getBitAtS(result, 14)).append("\n");
+				sb.append("\t\tPowerDoorLocksValid:").append(bitOperator.getBitAtS(result, 15)).append("\n");
+
+				break;
+			case 0x05: //Windows
+				assert resultLen == 4;
+				sb.append("\t\tMainWindow:").append(resultBytes[0]).append("\n");
+				sb.append("\t\tDeputyWindow:").append(resultBytes[1]).append("\n");
+				sb.append("\t\tMainRearWindow:").append(resultBytes[2]).append("\n");
+				sb.append("\t\tDeputyRearWindow:").append(resultBytes[3]).append("\n");
+				break;
+			case 0x07: // Sunroof
+				assert resultLen == 2;
+				sb.append("\t\tSunroof 1:").append(resultBytes[0]).append("\n");
+				sb.append("\t\tSunroof 2:").append(resultBytes[1]).append("\n");
+				break;
+
+			case 0x09: // Light
+
+				break;
+			case 0x0b: //Financial Lock
+				break;
+			case 0x0d: //Financial lock active
+				break;
+			case 0x0f: //Engine
+				break;
+			case 0x11: //Acc
+				break;
+			case 0x13: // Wifi
+				break;
+			case 0x14: // A/C
+				break;
+			case 0x15: // Windscreen wiper
+				break;
+			case 0x16: // Rear Mirror view
+				break;
+		}
+
+		return sb.toString();
 	}
 
 	private float parseFloatFromBytes(byte[] data, int startIndex, int length) {
