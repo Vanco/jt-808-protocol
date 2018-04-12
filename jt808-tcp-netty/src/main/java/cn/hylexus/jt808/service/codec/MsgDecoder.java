@@ -298,7 +298,7 @@ public class MsgDecoder {
                 sb.append("Version:").append("\n");
                 int v = this.parseIntFromBytes(data, 0, 1);
                 sb.append("\tF3A Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
-                sb.append("\tRetransmission?:").append(bitOperator.getBitAtS(v, 7));
+                sb.append("\tRetransmission?:").append(bitOperator.getBitAt(v, 7));
 
                 sb.append("Latitude:").append(this.parseIntFromBytes(data, 1, 4)).append("\n");
                 sb.append("Longitude:").append(this.parseIntFromBytes(data, 5, 4)).append("\n");
@@ -349,7 +349,71 @@ public class MsgDecoder {
 				sb.append("Version:").append("\n");
 				v = this.parseIntFromBytes(data, 0, 1);
 				sb.append("\tF3A Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
-				sb.append("\tRetransmission?:").append(bitOperator.getBitAtS(v, 7));
+				sb.append("\tRetransmission?:").append(bitOperator.getBitAt(v, 7)).append("\n");
+				int pkgNum = this.parseIntFromBytes(data, 1, 1);
+				sb.append("\tPackageNum:").append(pkgNum).append("\n");
+
+				for (int i = 0, offset = 0; i < pkgNum; i ++) {
+					//GPS
+					sb.append("\t\tLatitude:").append(this.parseIntFromBytes(data, 2 + offset, 4)).append("\n");
+					sb.append("\t\tLongitude:").append(this.parseIntFromBytes(data, 6 + offset, 4)).append("\n");
+					sb.append("\t\tAltitude:").append(this.parseIntFromBytes(data, 10 + offset, 2)).append("\n");
+					sb.append("\t\tDirection:").append(this.parseIntFromBytes(data, 12 + offset, 2)).append("\n");
+					sb.append("\t\tGpsTime:").append(this.parseBcdStringFromBytes(data, 14 + offset, 6)).append("\n");
+
+					int pkgNum2 =  bitOperator.getBitRange(this.parseIntFromBytes(data, 20 + offset, 1),0, 3);
+
+					sb.append("\t\tSecondPkgNumber:").append(pkgNum2).append("\n");
+					int p = 0;
+					for (int j = 0; j < pkgNum2; j ++) {
+						sb.append("\t\t").append(j).append("==>").append("\n");
+						sb.append("\t\t\tEngineSpeed:").append(this.parseIntFromBytes(data, 21 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tCarMeterSpeed:").append(this.parseIntFromBytes(data, 23 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tWheelSpeed:").append(this.parseIntFromBytes(data, 25 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tGpsSpeed:").append(this.parseIntFromBytes(data, 27 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tGasolineThrottle:").append(this.parseIntFromBytes(data, 29 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tEngine output torque:").append(this.parseIntFromBytes(data, 30 + offset + p, 1)).append("\n");
+
+						int tmp = this.parseIntFromBytes(data, 31 + offset + p, 1);
+						sb.append("\t\t\tParking Brake Switch:").append(bitOperator.getBitRange(tmp, 0, 1)).append("\n");
+						sb.append("\t\t\tBrake Switch:").append(bitOperator.getBitRange(tmp, 2, 3)).append("\n");
+						sb.append("\t\t\tClutch switch:").append(bitOperator.getBitRange(tmp, 4, 5)).append("\n");
+						sb.append("\t\t\tCruise control setting switch:").append(bitOperator.getBitRange(tmp, 6, 7)).append("\n");
+
+						sb.append("\t\t\tCurrent Gear:").append(this.parseIntFromBytes(data, 32 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tTarget Gear:").append(this.parseIntFromBytes(data, 33 + offset + p, 1)).append("\n");
+
+						sb.append("\t\t\tEngine fuel consumption rate:").append(this.parseIntFromBytes(data, 34 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tSlope:").append(this.parseIntFromBytes(data, 36 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tLoading:").append(this.parseIntFromBytes(data, 38 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tFuel Level:").append(this.parseIntFromBytes(data, 40 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tWater Temperature:").append(this.parseIntFromBytes(data, 41 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tAtmospheric pressure:").append(this.parseIntFromBytes(data, 42 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tIntake Pressure:").append(this.parseIntFromBytes(data, 43 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tAtmospheric Temperature:").append(this.parseIntFromBytes(data, 45 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tExhaust Temperature:").append(this.parseIntFromBytes(data, 46 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tIntake manifold boost pressure:").append(this.parseIntFromBytes(data, 48 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tRelative pressure:").append(this.parseIntFromBytes(data, 50 + offset + p, 2)).append("\n");
+						sb.append("\t\t\tEngine torque mode:").append(this.parseIntFromBytes(data, 52 + offset + p, 1)).append("\n");
+						sb.append("\t\t\thydraulics pressure:").append(this.parseIntFromBytes(data, 53 + offset + p, 2)).append("\n");
+
+						sb.append("\t\t\tUrea level:").append(this.parseIntFromBytes(data, 55 + offset + p, 1)).append("\n");
+						sb.append("\t\t\tStatus Flag:").append(this.parseIntFromBytes(data, 56 + offset + p, 4)).append("\n"); //todo
+
+						int extLen = this.parseIntFromBytes(data, 60 + offset + p, 1);
+						sb.append("\t\t\tExtLength:").append(extLen).append("\n");
+						if (extLen > 0) {
+							sb.append("\t\t\tExtData:").append(Arrays.toString(Arrays.copyOfRange(data, 61 + offset + p, 61 + offset + p + extLen -1))).append("\n");
+						}
+
+						p += 40 + extLen;
+
+					}
+
+					offset += 19 + p;
+				}
+
+
 
 				break;
 
@@ -372,18 +436,18 @@ public class MsgDecoder {
 			case 0x02: //Door
 				assert resultLen == 2;
 				int result = bitOperator.twoBytesToInteger(resultBytes);
-				sb.append("\t\tMainDriveDoor:").append(bitOperator.getBitAtS(result, 0)).append("\n");
-				sb.append("\t\tMainDriveDoorValid:").append(bitOperator.getBitAtS(result, 1)).append("\n");
-				sb.append("\t\tDeputyDriveDoor:").append(bitOperator.getBitAtS(result, 2)).append("\n");
-				sb.append("\t\tDeputyDriveDoorValid:").append(bitOperator.getBitAtS(result, 3)).append("\n");
-				sb.append("\t\tMainRearDoor:").append(bitOperator.getBitAtS(result, 4)).append("\n");
-				sb.append("\t\tMainRearDoorValid:").append(bitOperator.getBitAtS(result, 5)).append("\n");
-				sb.append("\t\tDeputyRearDoor:").append(bitOperator.getBitAtS(result, 6)).append("\n");
-				sb.append("\t\tDeputyRearDoorValid:").append(bitOperator.getBitAtS(result, 7)).append("\n");
-				sb.append("\t\tTailGate:").append(bitOperator.getBitAtS(result, 8)).append("\n");
-				sb.append("\t\tTailGateValid:").append(bitOperator.getBitAtS(result, 9)).append("\n");
-				sb.append("\t\tPowerDoorLocks:").append(bitOperator.getBitAtS(result, 14)).append("\n");
-				sb.append("\t\tPowerDoorLocksValid:").append(bitOperator.getBitAtS(result, 15)).append("\n");
+				sb.append("\t\tMainDriveDoor:").append(bitOperator.getBitAt(result, 0)).append("\n");
+				sb.append("\t\tMainDriveDoorValid:").append(bitOperator.getBitAt(result, 1)).append("\n");
+				sb.append("\t\tDeputyDriveDoor:").append(bitOperator.getBitAt(result, 2)).append("\n");
+				sb.append("\t\tDeputyDriveDoorValid:").append(bitOperator.getBitAt(result, 3)).append("\n");
+				sb.append("\t\tMainRearDoor:").append(bitOperator.getBitAt(result, 4)).append("\n");
+				sb.append("\t\tMainRearDoorValid:").append(bitOperator.getBitAt(result, 5)).append("\n");
+				sb.append("\t\tDeputyRearDoor:").append(bitOperator.getBitAt(result, 6)).append("\n");
+				sb.append("\t\tDeputyRearDoorValid:").append(bitOperator.getBitAt(result, 7)).append("\n");
+				sb.append("\t\tTailGate:").append(bitOperator.getBitAt(result, 8)).append("\n");
+				sb.append("\t\tTailGateValid:").append(bitOperator.getBitAt(result, 9)).append("\n");
+				sb.append("\t\tPowerDoorLocks:").append(bitOperator.getBitAt(result, 14)).append("\n");
+				sb.append("\t\tPowerDoorLocksValid:").append(bitOperator.getBitAt(result, 15)).append("\n");
 
 				break;
 			case 0x05: //Windows
