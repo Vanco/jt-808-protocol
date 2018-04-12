@@ -19,7 +19,7 @@
     </padding>
     <Text text="JT/808 Decoder" style="-fx-font-size: 24" textAlignment="CENTER"/>
 
-    <HBox>
+    <HBox spacing="5">
         <fx:define>
             <ToggleGroup fx:id="tgFormat"/>
         </fx:define>

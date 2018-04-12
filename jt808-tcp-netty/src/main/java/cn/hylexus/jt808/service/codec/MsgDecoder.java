@@ -243,10 +243,11 @@ public class MsgDecoder {
 				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
 				int cmdLen = this.parseIntFromBytes(data, 7, 1);
 				sb.append("Commands:").append(cmdLen).append("\n");
-				for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
-					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 9 + i, 1)).append("\n");
-					sb.append("\tCmdParam").append(i).append(":").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
+				for (int i = 0, offset = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
+					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 9 + offset, 1)).append("\n");
+					sb.append("\tCmdParam").append(i).append(":").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
+					offset += 3;
 				}
 				break;
 			case 0x0f41:
@@ -255,18 +256,20 @@ public class MsgDecoder {
 				sb.append("FlowId:").append(this.parseIntFromBytes(data, 7, 2)).append("\n");
 				cmdLen = this.parseIntFromBytes(data, 9, 1);
                 sb.append("Commands:").append(cmdLen).append("\n");
-                for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 10 + i, 1)).append("\n");
-					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 11 + i, 1)).append("\n");
-					sb.append("\tCmdStatus").append(i).append(":").append(this.parseIntFromBytes(data, 12 + i, 1)).append("\n");
+                for (int i = 0, offset = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
+					sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 11 + offset, 1)).append("\n");
+					sb.append("\tCmdStatus").append(i).append(":").append(this.parseIntFromBytes(data, 12 + offset, 1)).append("\n");
+					offset += 3;
 				}
 				break;
 			case 0x8f51:
 				sb.append("Version:").append(this.parseIntFromBytes(data, 0, 1)).append("\n");
 				sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
 				cmdLen = this.parseIntFromBytes(data, 7, 1);
-				for (int i = 0; i < cmdLen; i++) {
-					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + i, 1)).append("\n");
+				for (int i = 0, offset = 0; i < cmdLen; i++) {
+					sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
+					offset ++;
 				}
 				break;
 			case 0x0f51:
@@ -276,13 +279,13 @@ public class MsgDecoder {
 				sb.append("FlowId:").append(this.parseIntFromBytes(data, 8, 2)).append("\n");
 				cmdLen = this.parseIntFromBytes(data, 10, 1);
 				for (int i = 0, offset = 0; i < cmdLen; i++) {
-					int cmdNo = this.parseIntFromBytes(data, 11 + i + offset, 1);
+					int cmdNo = this.parseIntFromBytes(data, 11 + offset, 1);
 					sb.append("\tCmdNo").append(i).append(":").append(cmdNo).append("\n");
-					int resultLen = this.parseIntFromBytes(data, 12 + i + offset, 1);
+					int resultLen = this.parseIntFromBytes(data, 12 + offset, 1);
 					sb.append("\tCmdResult").append(i).append(":").append("\n");
-					byte[] resultBytes = Arrays.copyOfRange(data, 13 + i + offset, resultLen);
+					byte[] resultBytes = Arrays.copyOfRange(data, 13 + offset, resultLen);
 					sb.append(expend0f51Result(cmdNo, resultLen, resultBytes));
-					offset = offset + resultLen;
+					offset += 2 + resultLen;
 				}
 				break;
             case 0x9102:
@@ -309,15 +312,54 @@ public class MsgDecoder {
                 }
 
                 sb.append("Level 2 package number:").append(secondPkgNum).append("\n");
-                for (int i = 0; i < secondPkgNum; i ++) {
-                    sb.append("\tFaultInfoType").append(i).append(":").append(this.parseIntFromBytes(data, 20 + i, 1)).append("\n");
-                    sb.append("\tFaultInfoLength").append(i).append(":").append(this.parseIntFromBytes(data, 21 + i, 1)).append("\n");
-                    sb.append("\tSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 22 + i, 2)).append("\n");
-                    sb.append("\tGasolineThrottle").append(i).append(":").append(this.parseIntFromBytes(data, 24 + i, 1)).append("\n");
-                    sb.append("\tBrakeSignal").append(i).append(":").append(this.parseIntFromBytes(data, 24 + i, 1)).append("\n");
+                for (int i = 0, offset = 0; i < secondPkgNum; i ++) {
+                    sb.append("\tFaultInfoType").append(i).append(":").append(this.parseIntFromBytes(data, 20 + offset, 1)).append("\n");
+					int infoLen = this.parseIntFromBytes(data, 21 + offset, 1);
+					sb.append("\tFaultInfoLength").append(i).append(":").append(infoLen).append("\n");
+                    sb.append("\tSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 22 + offset, 2)).append("*1/256\n");
+                    sb.append("\tGasolineThrottle").append(i).append(":").append(this.parseIntFromBytes(data, 24 + offset, 1)).append("*0.4%\n");
+                    sb.append("\tBrakeSignal").append(i).append(":").append(this.parseIntFromBytes(data, 25 + offset, 1)).append("\n");
+                    sb.append("\tEngineSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 26 + offset, 2)).append("*0.125RPM\n");
+                    sb.append("\tTurbocharged engine pressure").append(i).append(":").append(this.parseIntFromBytes(data, 28 + offset, 1)).append("*2 KPa\n");
+					sb.append("\tEngine intake pressure").append(i).append(":").append(this.parseIntFromBytes(data, 29 + offset, 1)).append("*2 KPa\n");
+					sb.append("\tEngine exhaust temperature").append(i).append(":").append(this.parseIntFromBytes(data,30 + offset, 2)).append("*0.03125 ℃\n");
+					sb.append("\tEngine water temperature").append(i).append(":").append(this.parseIntFromBytes(data, 32 +  offset, 1)).append("-40 ℃\n");
+					sb.append("\tGasolineThrottleChangeRate").append(i).append(":").append(this.parseIntFromBytes(data, 33 + offset, 2)).append("%/s\n");
+					sb.append("\tGear").append(i).append(":").append(this.parseIntFromBytes(data, 35 + offset, 1)).append("-125\n");
+					sb.append("\tEngine output torque").append(i).append(":").append(this.parseIntFromBytes(data, 36 + offset, 1)).append("-125%\n");
+					sb.append("\tLoading").append(i).append(":").append(this.parseIntFromBytes(data, 37 + offset, 4)).append("kg\n");
+					sb.append("\tEngineLoad").append(i).append(":").append(this.parseIntFromBytes(data, 41 + offset, 1)).append("%\n");
+					sb.append("\tAcceleration").append(i).append(":").append(this.parseIntFromBytes(data, 42 + offset, 2)).append("*0.01 m/s\n");
+					sb.append("\tDeceleration").append(i).append(":").append(this.parseIntFromBytes(data, 44 + offset, 2)).append("*0.01 m/s\n");
+
+					int faultNum = this.parseIntFromBytes(data, 46 + offset, 1);
+					sb.append("\tFaultNumber").append(i).append(":").append(faultNum).append("\n");
+					for (int j = 0, p = 0; j < faultNum; j ++) {
+						sb.append("\t\tSoureAddr").append(j).append(":").append(this.parseIntFromBytes(data, 47 + offset + p, 1)).append("\n");
+						sb.append("\t\tSPN").append(j).append(":").append(this.parseIntFromBytes(data, 48 + offset + p, 4)).append("\n");
+						sb.append("\t\tFMI").append(j).append(":").append(this.parseIntFromBytes(data, 50 + offset + p, 1)).append("\n");
+						p += 6;
+					}
+
+					offset += 1 + infoLen;
                 }
                 break;
 
+			case 0x0f3b:
+				sb.append("Version:").append("\n");
+				v = this.parseIntFromBytes(data, 0, 1);
+				sb.append("\tF3A Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
+				sb.append("\tRetransmission?:").append(bitOperator.getBitAtS(v, 7));
+
+				break;
+
+			case 0x2035:
+				sb.append("VIN:").append(this.parseStringFromBytes(data, 0, 17)).append("\n");
+				sb.append("ECU-ID:").append(this.parseBcdStringFromBytes(data, 17, 12)).append("\n");
+				sb.append("VAN:").append(this.parseStringFromBytes(data, 29, 10)).append("\n");
+				sb.append("SN:").append(this.parseStringFromBytes(data, 39, 32)).append("\n");
+				sb.append("Plate Number:").append(this.parseStringFromBytes(data, 71, msgHeader.getMsgBodyLength() - 71 -1));
+				break;
 				default: sb.append(Arrays.toString(data)).append("\n");
 		}
 
