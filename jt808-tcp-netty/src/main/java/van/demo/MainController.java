@@ -7,13 +7,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleGroup;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
 
 /**
  * &copy; fanhuagang@gmail.com
@@ -48,14 +46,14 @@ public class MainController implements Initializable {
             PackageData packageData = decoder.bytes2PackageData(bytes);
             target.appendText(packageData.getMsgHeader().toString());
             target.appendText("\n");
-            target.appendText(decoder.toBodyString(packageData));
+            target.appendText(decoder.bodyToString(packageData));
         } else {
             String hex = text.replaceFirst("^7[e|E]", "").replaceFirst("7[e|E]$", "");
 
             PackageData packageData = decoder.bytes2PackageData(HexStringUtils.hexString2Bytes(hex).getBytes());
             target.appendText(packageData.getMsgHeader().toString());
             target.appendText("\n");
-            target.appendText(decoder.toBodyString(packageData));
+            target.appendText(decoder.bodyToString(packageData));
         }
 
         input.requestFocus();

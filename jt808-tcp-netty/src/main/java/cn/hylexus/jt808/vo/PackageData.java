@@ -61,7 +61,7 @@ public class PackageData {
 
 	@Override
 	public String toString() {
-		return "PackageData [msgHeader=" + msgHeader + ", msgBodyBytes=" + Arrays.toString(msgBodyBytes) + ", checkSum="
+		return "PackageData [\n\tmsgHeader=" + msgHeader + ", \n\tmsgBodyBytes=" + Arrays.toString(msgBodyBytes) + ", \n\tcheckSum="
 				+ checkSum + /*", address=" + channel +*/ "]";
 	}
 
@@ -186,11 +186,11 @@ public class PackageData {
 
 		@Override
 		public String toString() {
-			return "MsgHeader [msgId=0x" + msgIdToHexString() + ", msgBodyPropsField=" + msgBodyPropsField + ", msgBodyLength="
-					+ msgBodyLength + ", encryptionType=" + encryptionType + ", hasSubPackage=" + hasSubPackage
-					+ ", reservedBit=" + reservedBit + ", terminalPhone=" + terminalPhone + ", flowId=" + flowId
-					+ ", packageInfoField=" + packageInfoField + ", totalSubPackage=" + totalSubPackage
-					+ ", subPackageSeq=" + subPackageSeq + "]";
+			return "MsgHeader [\n\tmsgId=0x" + msgIdToHexString() + ", \n\tmsgBodyPropsField=" + msgBodyPropsField + ", \n\tmsgBodyLength="
+					+ msgBodyLength + ", \n\tencryptionType=" + encryptionType + ", \n\thasSubPackage=" + hasSubPackage
+					+ ", \n\treservedBit=" + reservedBit + ", \n\tterminalPhone=" + terminalPhone + ", \n\tflowId=" + flowId
+					+ ", \n\tpackageInfoField=" + packageInfoField + ", totalSubPackage=" + totalSubPackage
+					+ ", \n\tsubPackageSeq=" + subPackageSeq + "\n]\n";
 		}
 
 		public String msgIdToHexString() {
