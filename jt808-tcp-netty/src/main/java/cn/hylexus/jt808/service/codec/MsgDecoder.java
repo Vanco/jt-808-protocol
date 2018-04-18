@@ -1,5 +1,6 @@
 package cn.hylexus.jt808.service.codec;
 
+import cn.hylexus.jt808.util.HexStringUtils;
 import cn.hylexus.jt808.vo.req.LocationInfoUploadMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,6 +280,10 @@ public class MsgDecoder {
                 expend0f3b(sb, data);
                 break;
 
+            case 0x0f3c:
+                expend0f3c(sb, data);
+                break;
+
             case 0x2035:
                 sb.append("VIN:").append(this.parseStringFromBytes(data, 0, 17)).append("\n");
                 sb.append("ECU-ID:").append(this.parseBcdStringFromBytes(data, 17, 12)).append("\n");
@@ -287,10 +292,28 @@ public class MsgDecoder {
                 sb.append("Plate Number:").append(this.parseStringFromBytes(data, 71, msgHeader.getMsgBodyLength() - 71 - 1));
                 break;
             default:
-                sb.append(Arrays.toString(data)).append("\n");
+                log.warn("Message 0x{} body decoder not yet implemented!", msgHeader.msgIdToHexString());
+                sb.append("Hex:").append(HexStringUtils.toHexString(data)).append("\n");
         }
 
         return sb.toString();
+    }
+
+    private void expend0f3c(StringBuilder sb, byte[] data) {
+        sb.append("Version:").append("\n");
+        int v = this.parseIntFromBytes(data, 0, 1);
+        sb.append("\tF3C Version:").append(bitOperator.getBitRange(v, 0, 5)).append("\n");
+        sb.append("\tChart End:").append(bitOperator.getBitAt(v,6)).append("\n");
+        sb.append("\tRetransmission?:").append(bitOperator.getBitAt(v, 7)).append("\n");
+        sb.append("Latitude:").append(this.parseIntFromBytes(data, 1, 4)).append("\n");
+        sb.append("Longitude:").append(this.parseIntFromBytes(data, 5, 4)).append("\n");
+        sb.append("Altitude:").append(this.parseIntFromBytes(data, 9, 2)).append("\n");
+        sb.append("Direction:").append(this.parseIntFromBytes(data, 11, 2)).append("\n");
+        sb.append("GpsTime:").append(this.parseBcdStringFromBytes(data, 13, 6)).append("\n");
+
+        sb.append("StartTime:").append(this.parseBcdStringFromBytes(data, 19, 6)).append("\n");
+        sb.append("EndTime:").append(this.parseBcdStringFromBytes(data, 25, 6)).append("\n");
+        //todo
     }
 
     private void expend0f3b(StringBuilder sb, byte[] data) {
