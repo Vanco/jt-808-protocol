@@ -302,6 +302,7 @@ public class MsgDecoder {
         sb.append("PackageNum:").append(pkgNum).append("\n");
 
         for (int i = 0, offset = 0; i < pkgNum; i++) {
+            sb.append(i).append("==>\n");
             //GPS
             sb.append("\tLatitude:").append(this.parseIntFromBytes(data, 2 + offset, 4)).append("\n");
             sb.append("\tLongitude:").append(this.parseIntFromBytes(data, 6 + offset, 4)).append("\n");
@@ -314,7 +315,7 @@ public class MsgDecoder {
             sb.append("\tSecondPkgNumber:").append(pkgNum2).append("\n");
             int p = 0;
             for (int j = 0; j < pkgNum2; j++) {
-                sb.append("\t").append(j).append("==>").append("\n");
+                sb.append("\t").append(j).append("==>\n");
                 sb.append("\t\tEngineSpeed:").append(this.parseIntFromBytes(data, 21 + offset + p, 2)).append("\n");
                 sb.append("\t\tCarMeterSpeed:").append(this.parseIntFromBytes(data, 23 + offset + p, 2)).append("\n");
                 sb.append("\t\tWheelSpeed:").append(this.parseIntFromBytes(data, 25 + offset + p, 2)).append("\n");
@@ -393,31 +394,33 @@ public class MsgDecoder {
 
         sb.append("Level 2 package number:").append(secondPkgNum).append("\n");
         for (int i = 0, offset = 0; i < secondPkgNum; i++) {
-            sb.append("\tFaultInfoType").append(i).append(":").append(this.parseIntFromBytes(data, 20 + offset, 1)).append("\n");
+            sb.append(i).append("==>").append("\n");
+            sb.append("\tFaultInfoType").append(":").append(this.parseIntFromBytes(data, 20 + offset, 1)).append("\n");
             int infoLen = this.parseIntFromBytes(data, 21 + offset, 1);
-            sb.append("\tFaultInfoLength").append(i).append(":").append(infoLen).append("\n");
-            sb.append("\tSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 22 + offset, 2)).append("*1/256\n");
-            sb.append("\tGasolineThrottle").append(i).append(":").append(this.parseIntFromBytes(data, 24 + offset, 1)).append("*0.4%\n");
-            sb.append("\tBrakeSignal").append(i).append(":").append(this.parseIntFromBytes(data, 25 + offset, 1)).append("\n");
-            sb.append("\tEngineSpeed").append(i).append(":").append(this.parseIntFromBytes(data, 26 + offset, 2)).append("*0.125RPM\n");
-            sb.append("\tTurbocharged engine pressure").append(i).append(":").append(this.parseIntFromBytes(data, 28 + offset, 1)).append("*2 KPa\n");
-            sb.append("\tEngine intake pressure").append(i).append(":").append(this.parseIntFromBytes(data, 29 + offset, 1)).append("*2 KPa\n");
-            sb.append("\tEngine exhaust temperature").append(i).append(":").append(this.parseIntFromBytes(data, 30 + offset, 2)).append("*0.03125 ℃\n");
-            sb.append("\tEngine water temperature").append(i).append(":").append(this.parseIntFromBytes(data, 32 + offset, 1)).append("-40 ℃\n");
-            sb.append("\tGasolineThrottleChangeRate").append(i).append(":").append(this.parseIntFromBytes(data, 33 + offset, 2)).append("%/s\n");
-            sb.append("\tGear").append(i).append(":").append(this.parseIntFromBytes(data, 35 + offset, 1)).append("-125\n");
-            sb.append("\tEngine output torque").append(i).append(":").append(this.parseIntFromBytes(data, 36 + offset, 1)).append("-125%\n");
-            sb.append("\tLoading").append(i).append(":").append(this.parseIntFromBytes(data, 37 + offset, 4)).append("kg\n");
-            sb.append("\tEngineLoad").append(i).append(":").append(this.parseIntFromBytes(data, 41 + offset, 1)).append("%\n");
-            sb.append("\tAcceleration").append(i).append(":").append(this.parseIntFromBytes(data, 42 + offset, 2)).append("*0.01 m/s\n");
-            sb.append("\tDeceleration").append(i).append(":").append(this.parseIntFromBytes(data, 44 + offset, 2)).append("*0.01 m/s\n");
+            sb.append("\tFaultInfoLength:").append(infoLen).append("\n");
+            sb.append("\tSpeed:").append(this.parseIntFromBytes(data, 22 + offset, 2)).append("*1/256\n");
+            sb.append("\tGasolineThrottle:").append(this.parseIntFromBytes(data, 24 + offset, 1)).append("*0.4%\n");
+            sb.append("\tBrakeSignal:").append(this.parseIntFromBytes(data, 25 + offset, 1)).append("\n");
+            sb.append("\tEngineSpeed:").append(this.parseIntFromBytes(data, 26 + offset, 2)).append("*0.125RPM\n");
+            sb.append("\tTurbocharged engine pressure:").append(this.parseIntFromBytes(data, 28 + offset, 1)).append("*2 KPa\n");
+            sb.append("\tEngine intake pressure:").append(this.parseIntFromBytes(data, 29 + offset, 1)).append("*2 KPa\n");
+            sb.append("\tEngine exhaust temperature:").append(this.parseIntFromBytes(data, 30 + offset, 2)).append("*0.03125 ℃\n");
+            sb.append("\tEngine water temperature:").append(this.parseIntFromBytes(data, 32 + offset, 1)).append("-40 ℃\n");
+            sb.append("\tGasolineThrottleChangeRate:").append(this.parseIntFromBytes(data, 33 + offset, 2)).append("%/s\n");
+            sb.append("\tGear:").append(this.parseIntFromBytes(data, 35 + offset, 1)).append("-125\n");
+            sb.append("\tEngine output torque:").append(this.parseIntFromBytes(data, 36 + offset, 1)).append("-125%\n");
+            sb.append("\tLoading:").append(this.parseIntFromBytes(data, 37 + offset, 4)).append("kg\n");
+            sb.append("\tEngineLoad:").append(this.parseIntFromBytes(data, 41 + offset, 1)).append("%\n");
+            sb.append("\tAcceleration:").append(this.parseIntFromBytes(data, 42 + offset, 2)).append("*0.01 m/s\n");
+            sb.append("\tDeceleration:").append(this.parseIntFromBytes(data, 44 + offset, 2)).append("*0.01 m/s\n");
 
             int faultNum = this.parseIntFromBytes(data, 46 + offset, 1);
-            sb.append("\tFaultNumber").append(i).append(":").append(faultNum).append("\n");
+            sb.append("\tFaultNumber:").append(faultNum).append("\n");
             for (int j = 0, p = 0; j < faultNum; j++) {
-                sb.append("\t\tSoureAddr").append(j).append(":").append(this.parseIntFromBytes(data, 47 + offset + p, 1)).append("\n");
-                sb.append("\t\tSPN").append(j).append(":").append(this.parseIntFromBytes(data, 48 + offset + p, 4)).append("\n");
-                sb.append("\t\tFMI").append(j).append(":").append(this.parseIntFromBytes(data, 50 + offset + p, 1)).append("\n");
+                sb.append("\t").append(j).append("==>\n");
+                sb.append("\t\tSourceAddr:").append(this.parseIntFromBytes(data, 47 + offset + p, 1)).append("\n");
+                sb.append("\t\tSPN:").append(this.parseIntFromBytes(data, 48 + offset + p, 4)).append("\n");
+                sb.append("\t\tFMI:").append(this.parseIntFromBytes(data, 50 + offset + p, 1)).append("\n");
                 p += 6;
             }
 
@@ -440,7 +443,7 @@ public class MsgDecoder {
         int cmdLen = this.parseIntFromBytes(data, 10, 1);
         sb.append("Commands:").append(cmdLen).append("\n");
         for (int i = 0, offset = 0; i < cmdLen; i++) {
-            sb.append(i).append("==>").append("\n");
+            sb.append(i).append("==>\n");
             int cmdNo = this.parseIntFromBytes(data, 11 + offset, 1);
             sb.append("\tCmdNo:").append(cmdNo).append("\n");
             int resultLen = this.parseIntFromBytes(data, 12 + offset, 1);
@@ -456,7 +459,8 @@ public class MsgDecoder {
         sb.append("Time:").append(this.parseBcdStringFromBytes(data, 1, 6)).append("\n");
         int cmdLen = this.parseIntFromBytes(data, 7, 1);
         for (int i = 0, offset = 0; i < cmdLen; i++) {
-            sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
+            sb.append(i).append("==>\n");
+            sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
             offset++;
         }
     }
@@ -468,9 +472,10 @@ public class MsgDecoder {
         int cmdLen = this.parseIntFromBytes(data, 9, 1);
         sb.append("Commands:").append(cmdLen).append("\n");
         for (int i = 0, offset = 0; i < cmdLen; i++) {
-            sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
-            sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 11 + offset, 1)).append("\n");
-            sb.append("\tCmdStatus").append(i).append(":").append(this.parseIntFromBytes(data, 12 + offset, 1)).append("\n");
+            sb.append(i).append("==>\n");
+            sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
+            sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 11 + offset, 1)).append("\n");
+            sb.append("\tCmdStatus:").append(this.parseIntFromBytes(data, 12 + offset, 1)).append("\n");
             offset += 3;
         }
     }
@@ -481,9 +486,10 @@ public class MsgDecoder {
         int cmdLen = this.parseIntFromBytes(data, 7, 1);
         sb.append("Commands:").append(cmdLen).append("\n");
         for (int i = 0, offset = 0; i < cmdLen; i++) {
-            sb.append("\tCmdNo").append(i).append(":").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
-            sb.append("\tCmdInstruction").append(i).append(":").append(this.parseIntFromBytes(data, 9 + offset, 1)).append("\n");
-            sb.append("\tCmdParam").append(i).append(":").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
+            sb.append(i).append("==>\n");
+            sb.append("\tCmdNo:").append(this.parseIntFromBytes(data, 8 + offset, 1)).append("\n");
+            sb.append("\tCmdInstruction:").append(this.parseIntFromBytes(data, 9 + offset, 1)).append("\n");
+            sb.append("\tCmdParam:").append(this.parseIntFromBytes(data, 10 + offset, 1)).append("\n");
             offset += 3;
         }
     }
