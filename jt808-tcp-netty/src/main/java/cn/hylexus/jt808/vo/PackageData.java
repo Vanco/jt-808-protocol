@@ -189,7 +189,7 @@ public class PackageData {
 			return "MsgHeader [\n\tmsgId=0x" + msgIdToHexString() + ", \n\tmsgBodyPropsField=" + msgBodyPropsField + ", \n\tmsgBodyLength="
 					+ msgBodyLength + ", \n\tencryptionType=" + encryptionType + ", \n\thasSubPackage=" + hasSubPackage
 					+ ", \n\treservedBit=" + reservedBit + ", \n\tterminalPhone=" + terminalPhone + ", \n\tflowId=" + flowId
-					+ ", \n\tpackageInfoField=" + packageInfoField + ", totalSubPackage=" + totalSubPackage
+					+ ", \n\tpackageInfoField=" + packageInfoField + ", \n\ttotalSubPackage=" + totalSubPackage
 					+ ", \n\tsubPackageSeq=" + subPackageSeq + "\n]\n";
 		}
 

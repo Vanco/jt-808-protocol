@@ -296,7 +296,7 @@ public class MsgDecoder {
     private void expend0f3b(StringBuilder sb, byte[] data) {
         sb.append("Version:").append("\n");
         int v = this.parseIntFromBytes(data, 0, 1);
-        sb.append("\tF3A Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
+        sb.append("\tF3B Version:").append(bitOperator.getBitRange(v, 0, 6)).append("\n");
         sb.append("\tRetransmission?:").append(bitOperator.getBitAt(v, 7)).append("\n");
         int pkgNum = this.parseIntFromBytes(data, 1, 1);
         sb.append("PackageNum:").append(pkgNum).append("\n");
@@ -438,12 +438,14 @@ public class MsgDecoder {
         sb.append("PackageFlag:").append(this.parseIntFromBytes(data, 7, 1)).append("\n");
         sb.append("FlowId:").append(this.parseIntFromBytes(data, 8, 2)).append("\n");
         int cmdLen = this.parseIntFromBytes(data, 10, 1);
+        sb.append("Commands:").append(cmdLen).append("\n");
         for (int i = 0, offset = 0; i < cmdLen; i++) {
+            sb.append(i).append("==>").append("\n");
             int cmdNo = this.parseIntFromBytes(data, 11 + offset, 1);
-            sb.append("\tCmdNo").append(i).append(":").append(cmdNo).append("\n");
+            sb.append("\tCmdNo:").append(cmdNo).append("\n");
             int resultLen = this.parseIntFromBytes(data, 12 + offset, 1);
-            sb.append("\tCmdResult").append(i).append(":").append("\n");
-            byte[] resultBytes = Arrays.copyOfRange(data, 13 + offset, resultLen);
+            sb.append("\tCmdResult:").append("\n");
+            byte[] resultBytes = Arrays.copyOfRange(data, 13 + offset, 13 + offset + resultLen);
             sb.append(expend0f51Result(cmdNo, resultLen, resultBytes));
             offset += 2 + resultLen;
         }

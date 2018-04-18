@@ -50,7 +50,7 @@ public class MainController implements Initializable {
         } else {
             String hex = text.replaceFirst("^7[e|E]", "").replaceFirst("7[e|E]$", "");
 
-            PackageData packageData = decoder.bytes2PackageData(HexStringUtils.hexString2Bytes(hex).getBytes());
+            PackageData packageData = decoder.bytes2PackageData(HexStringUtils.chars2Bytes(hex.toCharArray()));
             target.appendText(packageData.getMsgHeader().toString());
             target.appendText("\n");
             target.appendText(decoder.bodyToString(packageData));
